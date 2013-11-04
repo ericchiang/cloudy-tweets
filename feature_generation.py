@@ -34,6 +34,7 @@ class BagOfWordsFeatures(object):
     """
     def genTestFeats(self,X_bag_of_words):
         features = None
+        combine_limit = 10000
         for bag_of_words in X_bag_of_words:
             X_feats = [0.] * self.n
             for word in bag_of_words:
@@ -41,14 +42,23 @@ class BagOfWordsFeatures(object):
                     X_feats[self.word_indexes[word]] += 1.
                 except KeyError:
                     None
-            if features:
-                features = vstack([features,lil_matrix(X_feats)])
-            else:
-                features = lil_matrix(X_feats)
-        return features
+            features.append(X_feats)
+            if len(features) >= combine_limit:
+                if sparse_features is not None:
+                    sparse_features = vstack([sparse_features,
+                                              lil_matrix(features)])
+                else:
+                    sparse_features = lil_matrix(features)
+                features = []
+        if sparse_features is not None:
+            sparse_features = vstack([sparse_features,lil_matrix(features)])
+        else:
+            sparse_features = lil_matrix(features)
+            features = []
 
+        return lil_matrix(sparse_features)
 
-    def __init__(self,rare=100):
+    def __init__(self,rare=3):
         # min times a word must appear to be included in feature matrix
         self.rare = rare
         # index of word for feature matrix
