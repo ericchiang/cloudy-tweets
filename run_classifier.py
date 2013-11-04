@@ -1,5 +1,6 @@
 import sys
-import numpy
+import numpy as np
+import pickle as pk
 from sklearn.cross_validation import KFold
 from sklearn.linear_model import *
 from sklearn.decomposition import PCA
@@ -10,16 +11,26 @@ from utils import *
 """
 Run cross validation
 """
-def runCV(X,y,num_folds=10):
-    k_fold = KFold(n=len(X),n_folds=num_folds,indices=True)
-    y_pred = numpy.array([0.] * len(y))
+def runCV(y,k_fold):
+    y_pred = np.array([0.] * len(y))
+    i = 0
     for train_indices,test_indices in k_fold:
-        X_train = X[train_indices]
+        print '.',
+        clf     = Ridge(alpha=1e-5)
+        train_file = open('fold_data/train_%s' % (i,), 'r')
+        X_train = pk.load(train_file)
+        train_file.close()
         y_train = y[train_indices]
-        X_test  = X[test_indices]
-        y_test  = y[test_indices]
-        clf     = Ridge(alpha=1e-5) # Run Ridge Regression
-        y_pred[test_indices] = clf.fit(X_train,y_train).predict(X_test)
+        clf.fit(X_train,y_train)
+        del X_train
+        del y_train
+        test_file = open('fold_data/test_%s' % (i,), 'r')
+        X_test  = pk.load(test_file)
+        y_pred[test_indices] = clf.predict(X_test)
+        del clf
+        del X_test
+        i += 1
+
     for i in range(len(y_pred)):
         if y_pred[i] < 0.0:
             y_pred[i] = 0.0
@@ -67,17 +78,35 @@ if __name__ == '__main__':
     for row in data:
         bag_of_words = parseTweet(row[1])
         X_bag_of_words.append(bag_of_words)
-    X_bag_of_words = numpy.array(X_bag_of_words)
+    X_bag_of_words = np.array(X_bag_of_words)
 
 
     """
     Generate feature matrix using the top n words. Each column represents a
     word and each value represents the count of said word for that row.
     """
-    feat_generator = TopWordsFeatures(n=270)
+    printInfo("Generating Features")
+    feat_generator = TopWordsFeatures(n=300)
     X = feat_generator.fit(X_bag_of_words).generateFeatures(X_bag_of_words)
+    del X_bag_of_words
 
     printInfo("Features generated, shape: %s" % (X.shape,))
+
+    num_folds = 10
+    printInfo("Saving folds to disk (%s folds)" % (num_folds,))
+    k_fold = KFold(n=X.shape[0],n_folds=num_folds,indices=True)
+    i = 0
+    for train_indices,test_indices in k_fold:
+        printInfo("  Processing fold %s" % (i))
+        train_file = open('fold_data/train_%s' % (i,),'w')
+        pk.dump(X[train_indices,:],train_file)
+        train_file.close()
+        test_file = open('fold_data/test_%s' % (i,),'w')
+        pk.dump(X[test_indices,:],test_file)
+        test_file.close()
+        i += 1
+
+    del X
 
     """
 
@@ -99,15 +128,15 @@ if __name__ == '__main__':
 
         y = []
         for row in data:
-            y.append(numpy.float(row[var_index]))
-        y = numpy.array(y)
+            y.append(np.float(row[var_index]))
+        y = np.array(y)
 
-        y_pred = runCV(X,y)
-        mse = numpy.mean((y - y_pred)**2)
+        printInfo("Running CV for vairable '%s'" % (var_name,))
+        y_pred = runCV(y,k_fold)
+        mse = np.mean((y - y_pred)**2)
+        del y_pred
         mses.append(mse)
-        rmse = numpy.sqrt(mse)
         printInfo("Results for variable '%s'" % (var_name,))
         printInfo("  MSE : %s" % (mse,))
-        printInfo("  RMSE: %s" % (rmse,))
     for mse in mses:
         print mse

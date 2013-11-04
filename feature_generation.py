@@ -1,5 +1,6 @@
 import numpy
 import nltk
+from scipy.sparse import lil_matrix, vstack
 
 """
 Class for generating feature matrices from bag-of-words.
@@ -32,7 +33,7 @@ class BagOfWordsFeatures(object):
     features.
     """
     def genTestFeats(self,X_bag_of_words):
-        features = []
+        features = None
         for bag_of_words in X_bag_of_words:
             X_feats = [0.] * self.n
             for word in bag_of_words:
@@ -40,8 +41,11 @@ class BagOfWordsFeatures(object):
                     X_feats[self.word_indexes[word]] += 1.
                 except KeyError:
                     None
-            features.append(X_feats)
-        return numpy.array(features)
+            if features:
+                features = vstack([features,lil_matrix(X_feats)])
+            else:
+                features = lil_matrix(X_feats)
+        return features
 
 
     def __init__(self,rare=100):
@@ -65,6 +69,8 @@ class TopWordsFeatures(object):
 
     def generateFeatures(self,X_bag_of_words):
         features = []
+        sparse_features = None
+        combine_limit = 10000
         for bag_of_words in X_bag_of_words:
             X_feats = [0.] * self.n
             for word in bag_of_words:
@@ -73,7 +79,20 @@ class TopWordsFeatures(object):
                 except KeyError:
                     None
             features.append(X_feats)
-        return numpy.array(features)
+            if len(features) >= combine_limit:
+                if sparse_features is not None:
+                    sparse_features = vstack([sparse_features,
+                                              lil_matrix(features)])
+                else:
+                    sparse_features = lil_matrix(features)
+                features = []
+        if sparse_features is not None:
+            sparse_features = vstack([sparse_features,lil_matrix(features)])
+        else:
+            sparse_features = lil_matrix(features)
+            features = []
+
+        return lil_matrix(sparse_features)
 
 
     def __init__(self,n=100):
