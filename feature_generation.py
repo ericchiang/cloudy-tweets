@@ -1,3 +1,12 @@
+#!/usr/bin/python
+
+__author__    = "Eric Chiang"
+__copyright__ = "Copyright 2013, Eric Chiang"
+__email__     = "eric.chiang.m@gmail.com"
+
+__license__   = "GPL"
+__version__   = "3.0"
+
 import numpy
 import nltk
 from scipy.sparse import lil_matrix, vstack

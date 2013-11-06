@@ -1,3 +1,12 @@
+#!/usr/bin/python
+
+__author__    = "Eric Chiang"
+__copyright__ = "Copyright 2013, Eric Chiang"
+__email__     = "eric.chiang.m@gmail.com"
+
+__license__   = "GPL"
+__version__   = "3.0"
+
 import sys
 import numpy as np
 import pickle as pk
@@ -80,7 +89,7 @@ if __name__ == '__main__':
     headers = data[0]
     data = data[1:]
 
-    use_existing_features = True
+    use_existing_features = False
 
     if not use_existing_features:
         # Parse each tweet into a bag of words
@@ -96,7 +105,7 @@ if __name__ == '__main__':
         word and each value represents the count of said word for that row.
         """
         printInfo("Generating Features")
-        feat_generator = TopWordsFeatures(n=600)
+        feat_generator = TopWordsFeatures(n=2000)
         X = feat_generator.fit(X_bag_of_words).generateFeatures(X_bag_of_words)
         del X_bag_of_words
     
