@@ -75,7 +75,7 @@ to numeric and alphanumeric words.
       <li>Over 90</li>
       <li>Between 90 and 50</li>
       <li>Between 50 and 10</li>
-      <li>Less than 90</li>
+      <li>Less than 10</li>
     </ul>
   </li>
 </ul><br>
