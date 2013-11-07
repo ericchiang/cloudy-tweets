@@ -18,8 +18,11 @@ from format_data import *
 from utils import *
 
 """
-Run cross validation.
+This file handles the classification pipeline; reading the train.csv file,
+generating feature matrix, and preforming cross validation.
 """
+
+#Run cross validation.
 def runCV(y,k_fold):
     y_pred = np.array([0.] * len(y))
     i = 0
@@ -46,7 +49,7 @@ def runCV(y,k_fold):
         del X_test
         i += 1
 
-    # Because all scores must be between 0 and 1, augment 
+    # Because all scores must be between 0 and 1, augment predicted scores 
     for i in range(len(y_pred)):
         if y_pred[i] < 0.0:
             y_pred[i] = 0.0
@@ -122,26 +125,37 @@ if __name__ == '__main__':
         for train_indices,test_indices in k_fold:
 
             printInfo("  %s Processing sparce training features" % (i,))
+            # Generate trianing fold from bag of words
             train_bag_of_words = X_bag_of_words[train_indices]
+            # Map bag of words onto feature space
             train_sparce_feats = \
                     feat_generator.generateFeatures(train_bag_of_words)
             del train_bag_of_words
+
+            # Save training fold to file using pickle
             train_file = open('fold_data/train_%s.pk' % (i,),'w')
             pk.dump(train_sparce_feats,train_file)
             del train_sparce_feats
             train_file.close()
 
             printInfo("  %s Processing sparce test features" % (i,))
+            # Generate test fold from bag of words
             test_bag_of_words = X_bag_of_words[test_indices]
+            # Map bag of words onto feature space
             test_sparce_feats = \
                    feat_generator.generateFeatures(test_bag_of_words)
             del test_bag_of_words
+
+            # Save test fold to file using pickle
             test_file = open('fold_data/test_%s.pk' % (i,),'w')
             pk.dump(test_sparce_feats,test_file)
             del test_sparce_feats
             test_file.close()
+
+            # i++
             i += 1
-    
+   
+        # Save k folds object to file for future runs 
         folds_file = open('fold_data/k_fold.pk','w')
         pk.dump(k_fold,folds_file)
         folds_file.close()
@@ -151,18 +165,6 @@ if __name__ == '__main__':
         folds_file = open('fold_data/k_fold.pk','r')
         k_fold = pk.load(folds_file)
         folds_file.close()
-
-
-    """
-
-    pca = PCA()
-    pca.fit(X)
-
-    pca.n_components = 220
-
-    X = pca.fit_transform(X)
-    """
-    # printInfo("Feature reduced, shape: %s" % (X.shape,))
 
     printInfo("Running cross validation")
 
