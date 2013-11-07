@@ -1,3 +1,4 @@
 *.pyc
 *.swp
-*fold_data/*
+fold_data/*
+*.sh
