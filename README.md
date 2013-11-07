@@ -69,6 +69,7 @@ similar meanings. The binning effors which have been implemented so far pertain
 to numeric and alphanumeric words.
 <br>Currently bins:
 <ul>
+  <li>Alphanumeric</li>
   <li>Numeric
     <ul>
       <li>Over 90</li>
@@ -77,7 +78,6 @@ to numeric and alphanumeric words.
       <li>Less than 90</li>
     </ul>
   </li>
-  <li>Alphanumeric</li>
 </ul><br>
 Inital efforts to further partition bins failed to improve the accuracy of the
 hypothesis. Though admittingly, those efforts took place  when the feature 
