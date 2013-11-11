@@ -75,24 +75,32 @@ as inspired by Go, Bhayani, and Huang demonstration of its usefulness in
 Twitter sentiment classification [1]. Exclamation and question marks presence
 also collected which were both noted by Pang, Lee and Vaithyanathan to be an
 unobvious source of information to humans (grad students) picking indicator
-words [2]. Details under the 'Details/Musing' header.
-  Cross validation RMSE: 0.1578 (m = 3000; alpha = 1e-7; folds = 3)
-  Cross validation RMSE: 0.1576 (m = 4000; alpha = 1e-7; folds = 3)
-  Cross validation RMSE: 0.1586 (m = 5000; alpha = 1e-7; folds = 3)
-  Kaggle RMSE: 0.16298 (m = 3000; alpha = 1e-7; folds = 3)
-  Kaggle RMSE: 0.16314 (m = 4000; alpha = 1e-7; folds = 3)
-  Kaggle RMSE: 0.16370 (m = 5000; alpha = 1e-7; folds = 3)
+words [2]. Details under the 'Details/Musing' header.<br>
+  Cross validation RMSE: 0.1578 (m = 3000; alpha = 1e-7; folds = 3)<br>
+  Cross validation RMSE: 0.1576 (m = 4000; alpha = 1e-7; folds = 3)<br>
+  Cross validation RMSE: 0.1586 (m = 5000; alpha = 1e-7; folds = 3)<br>
+  Kaggle RMSE: 0.16298 (m = 3000; alpha = 1e-7)<br>
+  Kaggle RMSE: 0.16314 (m = 4000; alpha = 1e-7)<br>
+  Kaggle RMSE: 0.16370 (m = 5000; alpha = 1e-7)<br>
 
 UPDATE (2013-11-10):<br>
 Considering four new modificaitons after yesterday's results:<br>
-1. Increasing the alpha value to favor variance over bias.
-2. Considering word presense rather than word count for feature generation [1].
-3. Reworking altercation of scores predicited out of range (above 1.0 or bellow
-/0.0).
-4. Trying different classifiers. 
+Increasing the alpha value to favor variance over bias. Considering word 
+presense rather than word count for feature generation [1].Reworking
+altercation of scores predicited out of range (above 1.0 or bellow 0.0). Trying
+different classifiers.
 
 UPDATE (2013-11-11):<br>
-Elastic Net.
+Elastic net tested and imediately showed improvements to ridge. Takes
+significantly longer to run than ridge but is still completes in a reasonable
+amount of time. Attempted to test support vector machines regression since it
+has shown to be successful as a sentiment classifier. Unfortunately, time
+complexity is an issue since it took roughly twice the time of elastic net in
+inital testing. Am now using a free EC2 micro instance on AWS to run 
+regressions since I need to use my laptop for other work. If anyone wants to
+donate cycles message me! Currently placed 26th with elastic net results.<br>
+  Kaggle RMSE: 0.16014 (m = 3000; elastic net; alpha = 1e-5)
+  Kaggle RMSE: 0.15970 (m = 4000; elastic net; alpha = 1e-5)
 
 
 <h3>Details/Musings</h3>
