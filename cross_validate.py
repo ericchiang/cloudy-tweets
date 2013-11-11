@@ -27,7 +27,7 @@ def runCV(y,k_fold):
     y_pred = np.array([0.] * len(y))
     i = 0
     for train_indices,test_indices in k_fold:
-        clf = Ridge(alpha=1e-7) # Ridge Regression... really fast
+        clf = ElasticNet(alpha=1e-5)# Ridge(alpha=1e-7) # Ridge Regression... really fast
         # Read training data from file
         train_file = open('fold_data/train_%s.pk' % (i,), 'r')
         X_train = pk.load(train_file)
@@ -118,7 +118,7 @@ if __name__ == '__main__':
         words are split and used to generate training and test sparce matrices
         directly.
         """
-        num_folds = 10
+        num_folds = 3
         printInfo("Saving folds to disk (%s folds)" % (num_folds,))
         k_fold = KFold(n=len(X_bag_of_words),n_folds=num_folds,indices=True)
         i = 0
