@@ -28,7 +28,6 @@ class TopWordsFeatures(object):
         for bag_of_words in X_bag_of_words:
             all_words.extend(bag_of_words)
         top_words = nltk.FreqDist(all_words).keys()[:self.m]
-        print top_words
         for i in range(len(top_words)):
             self.word_indices[top_words[i]] = i
         return self

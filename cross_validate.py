@@ -12,6 +12,7 @@ import numpy as np
 import pickle as pk
 from sklearn.cross_validation import KFold
 from sklearn.linear_model import *
+from sklearn import svm
 from sklearn.decomposition import PCA
 from feature_generation import *
 from format_data import *
@@ -27,7 +28,9 @@ def runCV(y,k_fold):
     y_pred = np.array([0.] * len(y))
     i = 0
     for train_indices,test_indices in k_fold:
-        clf = ElasticNet(alpha=1e-5)# Ridge(alpha=1e-7) # Ridge Regression... really fast
+        clf = svm.SVR() #ElasticNet(alpha=1e-5)# Ridge(alpha=1e-7) # Ridge Regression... really fast
+
+        printInfo("  Fold %s: fitting" % (i + 1,))
         # Read training data from file
         train_file = open('fold_data/train_%s.pk' % (i,), 'r')
         X_train = pk.load(train_file)
@@ -38,6 +41,8 @@ def runCV(y,k_fold):
         # Clear Memory
         del X_train
         del y_train
+
+        printInfo("  Fold %s: predicting" % (i + 1,))
         # Read test data from file
         test_file = open('fold_data/test_%s.pk' % (i,), 'r')
         X_test  = pk.load(test_file)
@@ -55,6 +60,7 @@ def runCV(y,k_fold):
             y_pred[i] = 0.0
         elif y_pred[i] > 1.0:
             y_pred[i] = 1.0
+    print ' '
     return y_pred
 
 """
