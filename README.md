@@ -99,7 +99,7 @@ complexity is an issue since it took roughly twice the time of elastic net in
 inital testing. Am now using a free EC2 micro instance on AWS to run 
 regressions since I need to use my laptop for other work. If anyone wants to
 donate cycles message me! Currently placed 26th with elastic net results.<br>
-  Kaggle RMSE: 0.16014 (m = 3000; elastic net; alpha = 1e-5)
+  Kaggle RMSE: 0.16014 (m = 3000; elastic net; alpha = 1e-5)<br>
   Kaggle RMSE: 0.15970 (m = 4000; elastic net; alpha = 1e-5)
 
 
