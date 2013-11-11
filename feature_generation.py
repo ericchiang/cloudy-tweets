@@ -44,7 +44,7 @@ class TopWordsFeatures(object):
         combine_limit = 10000
         for bag_of_words in X_bag_of_words:
             X_feats = [0.] * self.m
-            for word in bag_of_words:
+            for word in set(bag_of_words):
                 try:
                     X_feats[self.word_indices[word]] += 1.
                 except KeyError:
