@@ -28,7 +28,9 @@ def runCV(y,k_fold):
     y_pred = np.array([0.] * len(y))
     i = 0
     for train_indices,test_indices in k_fold:
-        clf = svm.SVR() #ElasticNet(alpha=1e-5)# Ridge(alpha=1e-7) # Ridge Regression... really fast
+        # clf = svm.SVR()
+        clf = ElasticNet(alpha=1e-5)
+        # clf = Ridge(alpha=1e-7) # Ridge Regression... really fast
 
         printInfo("  Fold %s: fitting" % (i + 1,))
         # Read training data from file
@@ -135,7 +137,7 @@ if __name__ == '__main__':
             train_bag_of_words = X_bag_of_words[train_indices]
             # Map bag of words onto feature space
             train_sparce_feats = \
-                    feat_generator.generateFeatures(train_bag_of_words)
+                    feat_generator.vectorize(train_bag_of_words)
             del train_bag_of_words
 
             # Save training fold to file using pickle
@@ -149,7 +151,7 @@ if __name__ == '__main__':
             test_bag_of_words = X_bag_of_words[test_indices]
             # Map bag of words onto feature space
             test_sparce_feats = \
-                   feat_generator.generateFeatures(test_bag_of_words)
+                   feat_generator.vectorize(test_bag_of_words)
             del test_bag_of_words
 
             # Save test fold to file using pickle

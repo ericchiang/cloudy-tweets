@@ -10,6 +10,7 @@ __version__   = "3.0"
 import csv
 import re
 import string
+import numpy as np
 
 meta_tags = ['@mention','{link}']
 alphanumeric_word = 'ALPHANUMERIC_WORD'
@@ -36,7 +37,7 @@ def parseTwitterCSV(tweet_csv):
     tweet_reader = csv.reader(tweet_csv, delimiter=',', quotechar='"')
     for row in tweet_reader:
         data.append(row)
-    return data
+    return np.array(data)
 
 """
 Parse tweet into bag of words

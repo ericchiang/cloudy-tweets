@@ -48,7 +48,7 @@ if __name__ == '__main__':
         sys.stderr.write("[Error] Could not open file '%s'" % (sys.argv[2],))
         sys.exit(2)
 
-    num_feats = 4000
+    num_feats = 5000
 
     # variables
     var_names = ['s1','s2','s3','s4','s5',
@@ -96,12 +96,12 @@ if __name__ == '__main__':
 
     printInfo("Generating training features")
     # Generate features for train
-    X_train = feat_generator.generateFeatures(train_bag_of_words)
+    X_train = feat_generator.vectorize(train_bag_of_words)
     del train_bag_of_words
 
     printInfo("Generating test features")
     # Generate features for test
-    X_test = feat_generator.generateFeatures(test_bag_of_words)
+    X_test = feat_generator.vectorize(test_bag_of_words)
     del test_bag_of_words
 
     # Predicted scores for each variable
@@ -119,8 +119,8 @@ if __name__ == '__main__':
 
         # Initialize classifier
         # clf = Ridge(alpha=1e-4)
-        # clf = ElasticNet(alpha=1e-5);
-        clf = svm.SVR()
+        clf = ElasticNet(alpha=1e-5);
+        # clf = svm.SVR()
 
         # Train classifier
         printInfo("  Training classifier")

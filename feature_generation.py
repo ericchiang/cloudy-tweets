@@ -36,7 +36,7 @@ class TopWordsFeatures(object):
     Generate a sparce matrix representing the feature space of a set of bag
     of words.
     """
-    def generateFeatures(self,X_bag_of_words):
+    def vectorize(self,X_bag_of_words):
         features = []
         sparse_features = None
         # Limits the use of dense matrix before merging into sparce matrix 
