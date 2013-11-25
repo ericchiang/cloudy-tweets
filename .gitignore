@@ -1,6 +1,5 @@
 *.pyc
 *.swp
-fold_data/*
 *.sh
 submissions/*
 account.py
