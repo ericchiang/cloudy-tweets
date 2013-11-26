@@ -32,11 +32,11 @@ class TweetTokenizer(object):
             mph  = float(m.group(3))
             sent = ""
             if temp > 85:
-                sent = 'HOT NUMBER'
+                sent = 'HOTNUMBER'
             elif temp > 45:
-                sent = 'NICE NUMBER'
+                sent = 'NICENUMBER'
             else:
-                sent = 'COLD NUMBER'
+                sent = 'COLDNUMBER'
     
             temp = str(int(temp / 10.0) * 10)
             humd = str(int(humd / 10.0) * 10)
@@ -83,13 +83,15 @@ class TweetTokenizer(object):
             if self.re_numb.match(token):
                 token = float(token)
                 if token > 120:
-                    token = 'LARGE NUMBER'
+                    token = 'LARGENUMBER'
                 elif token > 85:
-                    token = 'HOT NUMBER'
+                    token = 'HOTNUMBER'
                 elif token > 45:
-                    token = 'NICE NUMBER'
+                    token = 'NICENUMBER'
+                elif token > 10:
+                    token = 'COLDNUMBER'
                 else:
-                    token = 'COLD NUMBER'
+                    token = 'SMALLNUMBER'
             if token:
                 return_tokens.append(token)
     
@@ -103,4 +105,4 @@ if __name__ == '__main__':
     tweets = train_data['tweet'].tolist()
     for tweet in tweets[:100]:
         print tweet
-        print tokenizer.tokenize_tweet(tweet)
+        print " ".join(tokenizer.tokenize_tweet(tweet))
