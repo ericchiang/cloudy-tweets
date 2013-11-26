@@ -15,7 +15,6 @@ def run_fold(train_indices,test_indices,vectorizer,train_data,pred,queue):
     """ Function for running fold in pararelle
     """
     print "Processing Fold"
-    sleep(2)
     train_raw = raw_tweets[train_indices].tolist()
     test_raw  = raw_tweets[test_indices].tolist()
     X_train = vectorizer.transform(train_raw)
