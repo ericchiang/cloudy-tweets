@@ -1,11 +1,11 @@
 import re
 import string
-import nltk
 
-
-class TweetTokenizer(Object):
-
-    def __init__:
+"""
+Built class to hopefully make this easier on yhat
+"""
+class TweetTokenizer(object):
+    def __init__(self):
         self.re_number = re.compile(r'^\d*\.?\d+$')
         self.re_alphanum = re.compile('\d')
         self.re_weather = re.compile("#WEATHER.* (\d+\.\d+)F.* (\d+\.\d+)% Humidity. (\d+\.\d+)MPH")
@@ -19,32 +19,43 @@ class TweetTokenizer(Object):
         self.pos_emoticons = [':)',':-)',' : )',':D','=)',' : D ','(:','(=']
         self.neg_emoticons = [':(',':-(',' : (','=(','):',')=']
         self.ntr_emoticons = [':/','=/',':\\','=\\',':S','=S',':|','=|']
-
+        
         self.meta_mention = '@mention'
         self.meta_link = '{link}'
 
+    def tokenize_tweet(self,tweet):
 
-    def build_tokenizer():
-        return self.tokenize_tweet
-
-    def tokenize_tweet(tweet):
-        tweet = tweet.lower()
-
-        weather_match = self.re_weather.match(tweet):
-        if weather_match:
+        m = self.re_weather.match(tweet)
+        if m:
             temp = float(m.group(1))
             humd = float(m.group(2))
-
+            mph  = float(m.group(3))
+            sent = ""
+            if temp > 85:
+                sent = 'HOT NUMBER'
+            elif temp > 45:
+                sent = 'NICE NUMBER'
+            else:
+                sent = 'COLD NUMBER'
+    
+            temp = str(int(temp / 10.0) * 10)
+            humd = str(int(humd / 10.0) * 10)
+            mph  = str(int(mph / 10.0) * 10)
+            tokens = ['WEATHER','MPH'+mph,'TEMP'+temp,'HUMD'+humd,sent, 'TEMP']
+            return tokens
+    
+        tweet = tweet.lower()
+    
         if '!' in tweet:
             tweet = tweet.replace('!',' EXL ')
-
+    
         if '?' in tweet:
             tweet = tweet.replace('?',' QST ')
-
+    
         for emoticon in self.pos_emoticons:
             if emoticon in tweet:
                 tweet = tweet.replace(emoticon,' SMILEY ')
-
+    
         for emoticon in self.neg_emoticons:
             if emoticon in tweet:
                 tweet = tweet.replace(emoticon,' FROWNY ')
@@ -68,6 +79,7 @@ class TweetTokenizer(Object):
         return_tokens = []
     
         for token in tokens:
+            token = self.re_punc.sub('',token)
             if self.re_numb.match(token):
                 token = float(token)
                 if token > 120:
@@ -78,18 +90,17 @@ class TweetTokenizer(Object):
                     token = 'NICE NUMBER'
                 else:
                     token = 'COLD NUMBER'
-            else:
-                token = re_punc.sub('',token)
-
             if token:
                 return_tokens.append(token)
-
+    
         return return_tokens
 
+# Test 
 if __name__ == '__main__':
     import pandas as pd
+    tokenizer = TweetTokenizer()
     train_data = pd.read_csv(open('data/train.csv','r'),quotechar='"')
     tweets = train_data['tweet'].tolist()
     for tweet in tweets[:100]:
         print tweet
-        print tokenize_tweet(tweet)
+        print tokenizer.tokenize_tweet(tweet)
