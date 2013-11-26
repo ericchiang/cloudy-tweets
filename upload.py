@@ -2,7 +2,7 @@
 from account import username,apikey
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import SVR
-from tweet_text import tokenize_tweet
+from tweet_text import TweetTokenizer
 from yhat import Yhat, BaseModel
 import numpy as np
 import pandas as pd
@@ -14,7 +14,7 @@ class CloudyClassifier(BaseModel):
     def require(self):
         import re
         import string
-        self.vectorizer.tokenizer=tokenizer.tokenize_tweet
+        self.vectorizer.tokenizer=self.tokenizer.tokenize_tweet
 
 
     def transform(self, raw):
@@ -32,8 +32,10 @@ train_data = pd.read_csv(open('data/train.csv','r'),quotechar='"')[:1000]
 raw_tweets = train_data['tweet'].tolist()
 sanity_raw = raw_tweets[:100]
 
+
 sentiments = train_data.columns[4:].tolist()
-vectorizer = CountVectorizer(tokenizer=tokenize_tweet,
+tokenizer = TweetTokenizer()
+vectorizer = CountVectorizer(tokenizer=tokenizer.tokenize_tweet,
                              max_features=3000,
                              binary=True,
                              ngram_range=(1,1))
@@ -41,6 +43,7 @@ vectorizer = CountVectorizer(tokenizer=tokenize_tweet,
 yh = Yhat(username,apikey)
 
 X_train = vectorizer.fit_transform(raw_tweets)
+vectorizer.tokenizer=None
 
 for sentiment in sentiments:
     print "Processing '%s'" % sentiment
@@ -50,7 +53,7 @@ for sentiment in sentiments:
     print "  Training classifier"
     clf.fit(X_train,y_train)
 
-    tweet_clf = CloudyClassifier(clf=clf,vectorizer=vectorizer,tokenizer)
+    tweet_clf = CloudyClassifier(clf=clf,vectorizer=vectorizer,tokenizer=tokenizer)
     model_name = "TweetClassifier-%s" % (sentiment,)
 
     print "  Uploading to yhat"
