@@ -6,14 +6,18 @@ from tweet_text import TweetTokenizer
 from yhat import Yhat, BaseModel
 import numpy as np
 import pandas as pd
+import nltk
 
 sanity_tolerance = 0.001
 
 
 class CloudyClassifier(BaseModel):
+    """ Yhat classifier
+    """
     def require(self):
         import re
         import string
+        # Reset tokenizer after pickling
         self.vectorizer.tokenizer=self.tokenizer.tokenize_tweet
 
 
@@ -43,6 +47,8 @@ vectorizer = CountVectorizer(tokenizer=tokenizer.tokenize_tweet,
 yh = Yhat(username,apikey)
 
 X_train = vectorizer.fit_transform(raw_tweets)
+
+# Pickle can't pickle instancemethod objects
 vectorizer.tokenizer=None
 
 for sentiment in sentiments:
@@ -53,7 +59,8 @@ for sentiment in sentiments:
     print "  Training classifier"
     clf.fit(X_train,y_train)
 
-    tweet_clf = CloudyClassifier(clf=clf,vectorizer=vectorizer,tokenizer=tokenizer)
+    tweet_clf = CloudyClassifier(clf=clf,vectorizer=vectorizer,
+                                 tokenizer=tokenizer)
     model_name = "TweetClassifier-%s" % (sentiment,)
 
     print "  Uploading to yhat"

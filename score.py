@@ -20,9 +20,9 @@ best_model =\
  'k11':1, 'k12':1, 'k13':1, 'k14':1, 'k15':1
 }
 
-test_data = pd.read_csv(open('data/test.csv'),quotechar='"')
+test_data = pd.read_csv(open('data/test.csv','r'),quotechar='"')
 
-sub_data = pd.read_csv(open('data/sampleSubmission.csv'),quotechar='"')
+sub_data = pd.read_csv(open('data/sampleSubmission.csv','r'),quotechar='"')
 
 if not np.alltrue(test_data['id'] == sub_data['id']):
     raise Exception("IDs do not match")
@@ -33,7 +33,7 @@ sentiments = sub_data.columns[1:]
 raw_tweets = test_data['tweet'].tolist()
 
 for sentiment in sentiments:
-    moded_version = best_model[sentiment]
+    model_version = best_model[sentiment]
     model_name = "TweetClassifier-%s" % (sentiment,)
     results_from_server = yh.raw_predict(model_name,
                                          model_version,
