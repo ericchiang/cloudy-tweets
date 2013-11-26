@@ -1,9 +1,9 @@
 
-from account_info import username,apikey
+from account import username,apikey
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import SVR
+from tweet_text import tokenize_tweet
 from yhat import Yhat, BaseModel
-import nltk
 import numpy as np
 import pandas as pd
 
@@ -12,29 +12,33 @@ sanity_tolerance = 0.001
 
 class CloudyClassifier(BaseModel):
     def require(self):
-        import nltk
+        import re
+        import string
+        self.vectorizer.tokenizer=tokenizer.tokenize_tweet
+
 
     def transform(self, raw):
         X = self.vectorizer.transform(raw)
         return X
 
-    def predict(self,X)
+    def predict(self,X):
         pred = np.array(self.clf.predict(X))
         pred[np.where(pred > 1.0)] = 1.0
         pred[np.where(pred < 0.0)] = 0.0
         return {"scores" : pred}
 
-train_data = pd.read_csv(open('data/train.csv'),'r')
+train_data = pd.read_csv(open('data/train.csv','r'),quotechar='"')[:1000]
 
 raw_tweets = train_data['tweet'].tolist()
 sanity_raw = raw_tweets[:100]
 
 sentiments = train_data.columns[4:].tolist()
-
-vectorizer = CountVectorizer(tokenizer=nltk.word_tokenize,
+vectorizer = CountVectorizer(tokenizer=tokenize_tweet,
                              max_features=3000,
                              binary=True,
-                             ngram_range(1,1))
+                             ngram_range=(1,1))
+
+yh = Yhat(username,apikey)
 
 X_train = vectorizer.fit_transform(raw_tweets)
 
@@ -44,13 +48,14 @@ for sentiment in sentiments:
     y_train = train_data[sentiment].tolist()
 
     print "  Training classifier"
-    clf.train(X_train,y_train)
+    clf.fit(X_train,y_train)
 
-    tweet_clf = TweetClassifier(clf=clf,vectorizer=vectorizer)
+    tweet_clf = CloudyClassifier(clf=clf,vectorizer=vectorizer,tokenizer)
     model_name = "TweetClassifier-%s" % (sentiment,)
 
     print "  Uploading to yhat"
     upload_status = yh.upload(model_name,tweet_clf)
+    print upload_status
     model_version = upload_status['version'] 
 
     print "  '%s':'%s' uploaded to yhat" % (model_name,model_version)
