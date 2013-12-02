@@ -1,9 +1,21 @@
+#!/usr/bin/python
+
+__author__    = "Eric Chiang"
+__copyright__ = "Copyright 2013, Eric Chiang"
+__email__     = "eric.chiang.m@gmail.com"
+
+__license__   = "GPL"
+__version__   = "3.0"
+
 import re
 import string
 
 """
-Built class to hopefully make this easier on yhat
+Tokenizer to capture information from tweets
+
+Includes rare word binning
 """
+
 class TweetTokenizer(object):
     def __init__(self):
         self.re_number = re.compile(r'^\d*\.?\d+$')
@@ -25,6 +37,7 @@ class TweetTokenizer(object):
 
     def tokenize_tweet(self,tweet):
 
+        # This particular pattern represents 2% of tweet sample
         m = self.re_weather.match(tweet)
         if m:
             temp = float(m.group(1))
@@ -47,28 +60,24 @@ class TweetTokenizer(object):
         tweet = tweet.lower()
     
         if '!' in tweet:
-            tweet = tweet.replace('!',' EXL ')
-    
+            tweet = tweet.replace('!',' EXL ') 
         if '?' in tweet:
             tweet = tweet.replace('?',' QST ')
     
         for emoticon in self.pos_emoticons:
             if emoticon in tweet:
                 tweet = tweet.replace(emoticon,' SMILEY ')
-    
         for emoticon in self.neg_emoticons:
             if emoticon in tweet:
                 tweet = tweet.replace(emoticon,' FROWNY ')
-    
         if ';)' in tweet:
             tweet = tweet.replace(';)',' WINKY ')
-    
+
         if self.meta_mention in tweet:
             tweet = tweet.replace(self.meta_mention,' MENTION ')
-    
         if self.meta_link in tweet:
             tweet = tweet.replace(self.meta_link,' LINK ')
-    
+
         tweet = self.re_time.sub(' TIME ',tweet)
         tweet = self.re_temp.sub(r' TEMP \1 ',tweet)     
         tweet = self.re_velo.sub(r' WIND ',tweet)

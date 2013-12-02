@@ -1,3 +1,11 @@
+#!/usr/bin/python
+
+__author__    = "Eric Chiang"
+__copyright__ = "Copyright 2013, Eric Chiang"
+__email__     = "eric.chiang.m@gmail.com"
+
+__license__   = "GPL"
+__version__   = "3.0"
 
 from Queue import Queue
 from sklearn.cross_validation import KFold
@@ -10,9 +18,13 @@ import numpy as np
 import pandas as pd
 import sys
 
+"""
+Cross validation file
+"""
+
 
 def run_fold(train_indices,test_indices,vectorizer,train_data,pred,queue):
-    """ Function for running fold in pararelle
+    """ Run fold computation in parallel
     """
     print "Processing Fold"
     train_raw = raw_tweets[train_indices].tolist()
@@ -38,8 +50,10 @@ if len(variables) != 24:
    sys.stderr.write(variables)
    raise Exception("Bad number of sentiments")
 
+# Allocate data frame for predictions
 pred = train_data.copy()
 
+# Build vectorizer
 tokenizer = TweetTokenizer()
 print "Building vectorizer"
 vectorizer = CountVectorizer(tokenizer=tokenizer.tokenize_tweet,
@@ -47,13 +61,18 @@ vectorizer = CountVectorizer(tokenizer=tokenizer.tokenize_tweet,
                                        binary=True,
                                        ngram_range=(1,1))
 
+# Vectorization is done after folds are split. It's takes more time to slice a
+# sparce matrix than a list of strings.
 vectorizer.fit(raw_tweets)
+
 
 q = Queue()
 num_threads = 4
 num_folds = 8
-k_fold = KFold(n=len(raw_tweets),n_folds=num_folds,indices=True)
 threads = []
+
+# Spawn a thread for each fold
+k_fold = KFold(n=len(raw_tweets),n_folds=num_folds,indices=True)
 for train_indices,test_indices in k_fold:
     if len(threads) >= num_threads:
         while q.empty():
@@ -65,16 +84,15 @@ for train_indices,test_indices in k_fold:
     t.start()
     threads.append(t)
 
+# Wait for all threads to complete
 for t in threads:
     t.join()
 
-print pred.irow(9)
-
+# Calculate (and print) mean squred errors for each variable
 print "Mean Squared Errors:"
 for variable in variables:
     y_pred = np.array(pred[variable])
     y_actu = np.array(train_data[variable])
 
-    # Compute mean squared error
     mse = np.average((y_pred - y_actu)**2)
     print "'%s': %f" % (variable,mse)

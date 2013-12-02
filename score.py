@@ -1,3 +1,11 @@
+#!/usr/bin/python
+
+__author__    = "Eric Chiang"
+__copyright__ = "Copyright 2013, Eric Chiang"
+__email__     = "eric.chiang.m@gmail.com"
+
+__license__   = "GPL"
+__version__   = "3.0"
 
 from account_info import username,apikey
 from yhat import Yhat
@@ -5,12 +13,17 @@ import pandas as pd
 import numpy as np
 import sys
 
+"""
+Score train data using yhat and create a submission
+"""
+
 if len(sys.argv) != 2:
     sys.stderr.write("Please specify a file to write predictions out to!\n")
     sys.exit(2)
 
 sub_file = sys.argv[1]
 
+# Record the best model
 best_model =\
 {
  's1':1, 's2':1, 's3':1, 's4':1, 's5':1, 
@@ -29,17 +42,17 @@ if not np.alltrue(test_data['id'] == sub_data['id']):
 
 yh = Yhat(username, apikey)
 
-sentiments = sub_data.columns[1:]
+variabless = sub_data.columns[1:]
 raw_tweets = test_data['tweet'].tolist()
 
-for sentiment in sentiments:
-    model_version = best_model[sentiment]
-    model_name = "TweetClassifier-%s" % (sentiment,)
+for variable in variables:
+    model_version = best_model[variable]
+    model_name = "TweetClassifier_%s" % (variable,)
     results_from_server = yh.raw_predict(model_name,
                                          model_version,
                                          raw_tweets)
     pred = results_from_server['prediction']['scores']
-    sub_data[sentiment] = pred
+    sub_data[variable] = pred
 
 try:
     sub_data.to_csv(open(sub_file,'w'),index=False)
